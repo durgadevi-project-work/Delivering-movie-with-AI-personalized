@@ -3,13 +3,18 @@ import pandas as pd
 import numpy as np
 
 st.title("Personalized Movie Recommendation System")
+uploaded_file = st.sidebar.file_uploader("Upload your Excel file", type=["xlsx"])
 
-@st.cache_data
-def load_data():
-    df = pd.read_excel("personalized_movie_recommendation_dataset.xlsx")
-    return df
+if uploaded_file:
+    @st.cache_data
+    def load_data(file):
+        return pd.read_excel(file, engine="openpyxl")
 
-df = load_data()
+    df = load_data(uploaded_file)
+else:
+    st.warning("Please upload a valid Excel file with UserID, MovieTitle, Genre, Rating columns.")
+    st.stop()
+
 
 # Prepare user-item matrix
 user_movie_ratings = df.pivot_table(index="UserID", columns="MovieTitle", values="Rating", aggfunc=np.mean)
